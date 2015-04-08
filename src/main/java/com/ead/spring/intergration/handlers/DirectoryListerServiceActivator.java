@@ -7,7 +7,7 @@
  * This software is a proprietary information of Israeli Direct Insurance.
  * Created by IntelliJ IDEA. 
  */
-package com.ead.spring.intergration;
+package com.ead.spring.intergration.handlers;
 
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
