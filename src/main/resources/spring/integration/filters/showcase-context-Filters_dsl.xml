@@ -1,0 +1,40 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!-- todo need to see if resolved in next version of intellij -->
+<!--suppress RequiredBeanTypeInspection -->
+<beans xmlns="http://www.springframework.org/schema/beans"
+       xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+       xmlns:integration="http://www.springframework.org/schema/integration"
+       xmlns:file="http://www.springframework.org/schema/integration/file"
+       xmlns:task="http://www.springframework.org/schema/task"
+       xsi:schemaLocation="http://www.springframework.org/schema/beans
+    http://www.springframework.org/schema/beans/spring-beans.xsd
+
+
+    http://www.springframework.org/schema/integration
+    http://www.springframework.org/schema/integration/spring-integration.xsd
+    http://www.springframework.org/schema/integration/file
+    http://www.springframework.org/schema/integration/file/spring-integration-file.xsd
+    http://www.springframework.org/schema/task
+    http://www.springframework.org/schema/task/spring-task.xsd">
+	<integration:message-history tracked-components="rejected"/>
+
+	<task:executor id="executor1" pool-size="10"/>
+	<integration:poller id="defaultPoller" default="true" fixed-delay="10000" task-executor="executor1"
+	                    max-messages-per-poll="100">
+	</integration:poller>
+
+	<integration:channel id="allFilesChannel"/>
+
+	<!--
+
+		<integration:inbound-channel-adapter id="customDirectoriesAndFilesInBound" channel="allFilesChannel"
+											 ref="customInboundAdapter" method="createInBoundMessages"/>
+	-->
+
+	<file:inbound-channel-adapter id="directoriesAndFilesInBound" directory="file:/E:/Downloads"
+	                              channel="allFilesChannel" auto-startup="true" queue-size="10"
+	                              prevent-duplicates="false">
+	</file:inbound-channel-adapter>
+
+
+</beans>

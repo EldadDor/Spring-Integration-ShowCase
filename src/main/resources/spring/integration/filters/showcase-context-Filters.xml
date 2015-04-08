@@ -1,0 +1,68 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!-- todo need to see if resolved in next version of intellij -->
+<!--suppress RequiredBeanTypeInspection -->
+<beans xmlns="http://www.springframework.org/schema/beans"
+       xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+       xmlns:context="http://www.springframework.org/schema/context"
+       xmlns:integration="http://www.springframework.org/schema/integration"
+       xmlns:file="http://www.springframework.org/schema/integration/file"
+       xmlns:task="http://www.springframework.org/schema/task"
+       xsi:schemaLocation="http://www.springframework.org/schema/beans
+    http://www.springframework.org/schema/beans/spring-beans.xsd
+    http://www.springframework.org/schema/context
+    http://www.springframework.org/schema/context/spring-context.xsd
+    http://www.springframework.org/schema/integration
+    http://www.springframework.org/schema/integration/spring-integration.xsd
+    http://www.springframework.org/schema/integration/file
+    http://www.springframework.org/schema/integration/file/spring-integration-file.xsd
+    http://www.springframework.org/schema/task
+    http://www.springframework.org/schema/task/spring-task.xsd">
+	<integration:message-history tracked-components="rejected"/>
+	<context:component-scan base-package="com.ead.spring.intergration"/>
+
+	<task:executor id="executor1" pool-size="10"/>
+	<integration:poller id="defaultPoller" default="true" fixed-delay="10000" task-executor="executor1"
+	                    max-messages-per-poll="100">
+	</integration:poller>
+
+	<integration:channel id="allFilesChannel"/>
+	<integration:channel id="rejected"/>
+	<integration:channel id="validated"/>
+
+	<!--
+
+		<integration:inbound-channel-adapter id="customDirectoriesAndFilesInBound" channel="allFilesChannel"
+											 ref="customInboundAdapter" method="createInBoundMessages"/>
+	-->
+
+	<file:inbound-channel-adapter id="directoriesAndFilesInBound" directory="file:/E:/Downloads"
+	                              channel="allFilesChannel"
+	                              auto-startup="true"
+	                              queue-size="10" prevent-duplicates="false">
+	</file:inbound-channel-adapter>
+
+	<integration:outbound-channel-adapter channel="validated" ref="directoryListerEndPoint"
+	                                      method="handleFile">
+		<!--<filt-->
+	</integration:outbound-channel-adapter>
+	<!--<integration:logging-channel-adapter id="logChannel" expression="'Sending File=' + payload.path" channel="directoriesAndFilesChannel" level="INFO"/>-->
+
+	<integration:filter id="cancellationsFilter" input-channel="allFilesChannel"
+	                    ref="customFilterBean" method="filter" discard-channel="rejected" output-channel="validated"/>
+
+	<integration:service-activator id="inputFileServiceActivator" input-channel="rejected"
+	                               ref="directoryListerServiceActivator"
+	                               method="processFile" auto-startup="true">
+
+	</integration:service-activator>
+
+	<!--<integration:transformer id="filesTransformer" ref="filesTypesMessageTransformer" input-channel="allFilesChannel" output-channel="allFilesTransformedChannel"/>-->
+
+	<!--<integration:payload-type-router input-channel="allFilesTransformedChannel"
+	                                 default-output-channel="unknownFilesChannel">
+		<integration:mapping type="com.ead.spring.intergration.route.model.XmlFileMessage" channel="xmlFilesChannel"/>
+		<integration:mapping type="com.ead.spring.intergration.route.model.NonXmlFileMessage"
+		                     channel="nonXmlFilesChannel"/>
+	</integration:payload-type-router>
+-->
+</beans>

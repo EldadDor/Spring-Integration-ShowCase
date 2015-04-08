@@ -1,0 +1,126 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE log4j:configuration SYSTEM "log4j.dtd">
+<log4j:configuration xmlns:log4j="http://jakarta.apache.org/log4j/" debug="false">
+
+    <appender name="console" class="org.apache.log4j.ConsoleAppender">
+        <layout class="org.apache.log4j.PatternLayout">
+            <!--<param name="ConversionPattern" value="%d %-5p [%c{1}]=%t=%m%n"/>-->
+            <param name="ConversionPattern" value="%d %-5p [%c{1}]-[%t]-%m%n"/>
+        </layout>
+    </appender>
+
+    <appender name="file" class="org.apache.log4j.DailyRollingFileAppender">
+	    <param name="Append" value="true"/>
+        <param name="app" value="log4j_output.log"/>
+        <param name="encoding" value="UTF-8"/>
+        <param name="MaxFileSize" value="10MB"/>
+        <param name="MaxBackupIndex" value="1"/>
+        <layout class="org.apache.log4j.PatternLayout">
+	        <param name="ConversionPattern" value="%-5p - %d{MMM d h:mm:ss a}=%t=%m%n"/>
+	        <!--            <param name="ConversionPattern" value="%L - %r %-5p %c %x - %m - %d - %t%n"/>-->
+        </layout>
+    </appender>
+
+    <!-- don't use this appender. see IDI-16435 for more info -->
+    <appender name="emailDONTUSE" class="com.alphacsp.common.log.appenders.AlphaCSPSMTPAppender">
+        <param name="From" value="Error notifier"/>
+        <param name="To" value="java_exceptions@relay.yashir.co.il"/>
+        <param name="Subject" value="Error Report"/>
+        <param name="SMTPHost" value="mailsrv"/>
+        <param name="BufferSize" value="512"/>
+        <layout class="org.apache.log4j.PatternLayout">
+            <param name="ConversionPattern" value="[%d{ISO8601}]%n%-5p%n(in thread %t)%n%c%m"/>
+        </layout>
+    </appender>
+
+    <!-- open this to enable Debuging SQL values which pass  in SQLVO framework-->
+    <!--
+        <category name="com.idi.framework.util.jdbc.builder.impl.JdbcExecuterFeeder">
+            <level value="debug"/>
+        </category>
+        <category name="com.idi.framework.util.jdbc.InputParamSetValuesImpl">
+            <level value="debug"/>
+        </category>
+        <category name="com.idi.framework.util.jdbc.builder.impl.AbstractBuilderQueryConsume">
+            <level value="debug"/>
+        </category>
+    -->
+  <!--  <category name="com.idi.framework.client.flow">
+        <level value="info"/>
+    </category>
+
+    <category name="com.idi.tools">
+        <level value="error"/>
+    </category>
+
+    &lt;!&ndash; Performance tests &ndash;&gt;
+    <category name="com.idi.framework.common.test.IDITest">
+        <level value="info"/>
+    </category>
+
+    <category name="com.idi.framework.common.test.StressExecuter">
+        <level value="info"/>
+    </category>
+
+    <category name="com.idi.framework.vo.common.vo.SerializationDebugger">
+        <level value="error"/>
+    </category>
+
+    &lt;!&ndash; Performance tests &ndash;&gt;
+    &lt;!&ndash;<category name="com.idi.framework.util.common.IDIStopWatch">&ndash;&gt;
+    &lt;!&ndash;<level value="debug"/>&ndash;&gt;
+    &lt;!&ndash;</category>&ndash;&gt;
+    <category name="com.idi.framework.common.metadata.ModuleDefinition">
+        <level value="error"/>
+    </category>
+
+    <category name="com.idi.framework.gui.client.action.IDIAction">
+        <level value="error"/>
+    </category>
+
+    <category name="com.idi.policy.definitions.ldb.common.LDBContainer">
+        <level value="error"/>
+    </category>
+
+    <category name="com.idi.general.common.population">
+        <level value="debug"/>
+    </category>
+
+    <category name="com.idi.framework.common.services.StubFetcher">
+        <level value="info"/>
+    </category>
+
+    <category name="com.idi.framework.vo.common.vo.impl.AbstractDiscriminator">
+        <level value="error"/>
+    </category>
+
+    <category name="com.idi.framework.common.environment.ClassScanner">
+        <level value="info"/>
+    </category>
+
+    <category name="com.idi.framework.util.common.IDIMapUtil">
+        <level value="error"/>
+    </category>
+
+    <category name="com.idi.framework.util.services.server.LoggingStatement">
+        <level value="debug"/>
+    </category>
+
+    &lt;!&ndash; load balancer &ndash;&gt;
+    <category name="com.idi.jboss.interceptor.IDILoadBalancingPolicy">
+        <level value="debug"/>
+    </category>
+    <category name="com.idi.framework.loadbalancing">
+        <level value="debug"/>
+    </category>
+    <category name="com.gargoylesoftware.htmlunit">
+        <level value="error"/>
+    </category>
+-->
+    <root>
+        <level value="info"/>
+        <appender-ref ref="console"/>
+        <appender-ref ref="file"/>
+    </root>
+
+</log4j:configuration>

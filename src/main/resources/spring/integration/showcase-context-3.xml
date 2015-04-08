@@ -1,0 +1,85 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!-- todo need to see if resolved in next version of intellij -->
+<!--suppress RequiredBeanTypeInspection -->
+<beans xmlns="http://www.springframework.org/schema/beans"
+       xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+       xmlns:file="http://www.springframework.org/schema/integration/file"
+       xmlns:context="http://www.springframework.org/schema/context"
+       xmlns:task="http://www.springframework.org/schema/task"
+       xmlns:integration="http://www.springframework.org/schema/integration"
+       xsi:schemaLocation="http://www.springframework.org/schema/beans
+    http://www.springframework.org/schema/beans/spring-beans.xsd
+    http://www.springframework.org/schema/integration/file
+    http://www.springframework.org/schema/integration/file/spring-integration-file.xsd
+    http://www.springframework.org/schema/context
+    http://www.springframework.org/schema/context/spring-context.xsd
+    http://www.springframework.org/schema/integration
+    http://www.springframework.org/schema/integration/spring-integration.xsd
+    http://www.springframework.org/schema/task
+    http://www.springframework.org/schema/task/spring-task.xsd">
+	<integration:message-history/>
+	<context:component-scan base-package="com.ead.spring.intergration"/>
+
+	<integration:poller id="defaultPoller" default="true" fixed-delay="10000" task-executor="ifsExecutor2" max-messages-per-poll="10"/>
+	<!--QueueChannel-->
+	<integration:channel id="directoriesAndFilesChannel">
+		<integration:queue capacity="10"/>
+	</integration:channel>
+	<!--DirectChannel-->
+	<!--<integration:channel id="whatsAppChannel">
+	</integration:channel>-->
+
+	<!--SubscribableChannel-->
+	<!--<integration:publish-subscribe-channel id="whatsAppPublishSubscribeChannel">
+	</integration:publish-subscribe-channel>
+
+	-->
+	<!--<integration:publish-subscribe-channel id="whatsAppPublishSubscribeChannel" task-executor="ifsExecutor3"/>-->
+
+
+	<!--<integration:publish-subscribe-channel id="publishSubscribeChannel"/>-->
+
+	<!--<integration:bridge input-channel="whatsAppPublishSubscribeChannel" output-channel="whatsAppChannel"/>-->
+
+	<task:executor id="ifsExecutor" pool-size="1"/>
+	<task:executor id="ifsExecutor2" pool-size="20"/>
+	<task:executor id="ifsExecutor3" pool-size="10"/>
+
+	<integration:logging-channel-adapter id="logChannel" expression="'Sending File=' + payload.path" channel="directoriesAndFilesChannel" level="DEBUG"/>
+
+	<file:inbound-channel-adapter id="directoriesAndFilesInBound" directory="file:/c:/com.idi.ifs/in" channel="directoriesAndFilesChannel" auto-startup="true"
+	                              queue-size="10" prevent-duplicates="false">
+	</file:inbound-channel-adapter>
+
+	<integration:service-activator id="inputFileServiceActivator" input-channel="directoriesAndFilesChannel" ref="directoryListerServiceActivator"
+	                               method="processFile" auto-startup="true"/>
+
+
+	<!--<integration:outbound-channel-adapter channel="whatsAppChannel" ref="whatsAppFileEndPoint" method="handleFile">-->
+		<!--  todo this-->
+		<!--<integration:poller max-messages-per-poll="10" fixed-rate="1" task-executor="ifsExecutor2"/>-->
+		<!--	<integration:poller max-messages-per-poll="10" fixed-rate="1" task-executor="ifsExecutor2">
+			</integration:poller>-->
+	<!--</integration:outbound-channel-adapter>-->
+	<!--
+
+		<integration:channel id="bookingConfirmationRequests"/>
+		<integration:service-activator input-channel="bookingConfirmationRequests"
+									   output-channel="chargedBookings"
+									   ref="billForBookingService"/>
+		<integration:channel id="chargedBookings"/>
+		<integration:service-activator input-channel="chargedBookings"
+									   output-channel="completedBookings"
+									   ref="seatAvailabilityService"/>
+		<integration:publish-subscribe-channel id="completedBookings"/>
+		<integration:bridge input-channel="completedBookings"
+							output-channel="emailConfirmationRequests"/>
+		<integration:channel id="emailConfirmationRequests">
+			<integration:queue/>
+
+
+		</integration:channel>
+		<integration:outbound-channel-adapter channel="emailConfirmationRequests"
+											  ref="emailConfirmationService"/>
+	-->
+</beans>
