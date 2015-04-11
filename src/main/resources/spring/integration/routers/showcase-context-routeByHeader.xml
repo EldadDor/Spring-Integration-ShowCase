@@ -1,6 +1,5 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <!-- todo need to see if resolved in next version of intellij -->
-<!--suppress RequiredBeanTypeInspection -->
 <beans xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
        xmlns:context="http://www.springframework.org/schema/context"
        xmlns:integration="http://www.springframework.org/schema/integration"
@@ -21,7 +20,8 @@
 	<context:component-scan base-package="com.ead.spring.intergration"/>
 
 	<task:executor id="executor1" pool-size="10"/>
-	<integration:poller id="defaultPoller" default="true" fixed-delay="10000" task-executor="executor1" max-messages-per-poll="10">
+	<integration:poller id="defaultPoller" default="true" fixed-delay="10000" task-executor="executor1"
+	                    max-messages-per-poll="10">
 	</integration:poller>
 
 	<integration:channel id="allFilesChannel"/>
@@ -34,22 +34,27 @@
 	<integration:inbound-channel-adapter id="customDirectoriesAndFilesInBound" channel="allFilesChannel"
 	                                     ref="customInboundAdapter" method="createInBoundMessages"/>
 
-	<file:inbound-channel-adapter id="directoriesAndFilesInBound" directory="file:/c:/pics" channel="allFilesChannel" auto-startup="true"
+	<file:inbound-channel-adapter id="directoriesAndFilesInBound" directory="file:/c:/pics" channel="allFilesChannel"
+	                              auto-startup="true"
 	                              queue-size="10" prevent-duplicates="false">
 	</file:inbound-channel-adapter>
 
+	<integration:header-enricher>
+		<integration:header expression=""/>
+	</integration:header-enricher>
 	<!--<integration:logging-channel-adapter id="logChannel" expression="'Sending File=' + payload.path" channel="directoriesAndFilesChannel" level="INFO"/>-->
 
-	<integration:transformer id="filesTransformer" ref="filesTypesMessageTransformer" input-channel="allFilesChannel" output-channel="allFilesTransformedChannel"/>
+	<integration:transformer id="filesTransformer" ref="filesTypesMessageTransformer" input-channel="allFilesChannel"
+	                         output-channel="allFilesTransformedChannel"/>
 
-	<integration:payload-type-router input-channel="allFilesTransformedChannel" default-output-channel="unknownFilesChannel">
-		<integration:mapping type="com.ead.spring.intergration.model.XmlFileMessage" channel="xmlFilesChannel"/>
-		<integration:mapping type="com.ead.spring.intergration.model.NonXmlFileMessage" channel="nonXmlFilesChannel"/>
-	</integration:payload-type-router>
+	<integration:service-activator id="inputFileServiceActivator" input-channel="directoriesAndFilesChannel"
+	                               ref="directoryListerServiceActivator"
+	                               method="processFile" auto-startup="true">
+	</integration:service-activator>
 
 	<integration:header-value-router input-channel="allFilesTransformedChannel"
-	                                 header-name="PAYMENT_PROCESSING_DESTINATION">
-		<integration:mapping channel=""
+	                                 header-name="PROCESSING_DESTINATION">
+		<!--<integration:mapping value="CentralStation" channel=""-->
 	</integration:header-value-router>
 
 </beans>

@@ -26,21 +26,9 @@
 	</integration:poller>
 
 	<integration:channel id="allFilesChannel"/>
-	<integration:channel id="transformedPhase1Channel"/>
-	<integration:channel id="transformedPhase2Channel"/>
-	<integration:channel id="rejected"/>
-	<integration:channel id="validated"/>
+	<integration:channel id="splitted"/>
 
-	<integration:transformer input-channel="transformedPhase1Channel" output-channel="validated"
-	                         ref="transformerPhaseOne"/>
-	<integration:transformer input-channel="transformedPhase2Channel" output-channel="validated"
-	                         ref="transformerPhaseTwo"/>
-
-	<file:file-to-bytes-transformer input-channel="transformedPhase1Channel" output-channel="validated"/>
-	<integration:recipient-list-router input-channel="allFilesChannel">
-		<integration:recipient channel="transformedPhase1Channel"/>
-		<integration:recipient channel="transformedPhase2Channel"/>
-	</integration:recipient-list-router>
+	<integration:splitter expression="payload.list" input-channel="allFilesChannel" output-channel="splitted"/>
 
 	<file:inbound-channel-adapter id="directoriesAndFilesInBound" directory="file:/E:/Downloads"
 	                              channel="allFilesChannel"
@@ -48,6 +36,6 @@
 	                              queue-size="10" prevent-duplicates="false">
 	</file:inbound-channel-adapter>
 
-	<integration:outbound-channel-adapter channel="validated" ref="directoryListerEndPoint" method="handleFile"/>
+	<integration:outbound-channel-adapter channel="splitted" ref="directoryListerEndPoint" method="handleFile"/>
 
 </beans>

@@ -1,7 +1,7 @@
 package com.ead.spring.intergration.transform;
 
-import com.ead.spring.intergration.route.model.PhaseTwoPojo;
-import com.ead.spring.intergration.route.model.TransformationPhase;
+import com.ead.spring.intergration.model.PhaseTwoPojo;
+import com.ead.spring.intergration.model.TransformationPhase;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 import org.springframework.integration.annotation.Transformer;

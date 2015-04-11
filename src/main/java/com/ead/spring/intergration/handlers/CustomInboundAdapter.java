@@ -9,8 +9,8 @@
  */
 package com.ead.spring.intergration.handlers;
 
-import com.ead.spring.intergration.route.model.SimplePojo;
-import com.ead.spring.intergration.route.model.SimplePojoBuilder;
+import com.ead.spring.intergration.model.SimplePojo;
+import com.ead.spring.intergration.model.SimplePojoBuilder;
 import com.google.common.collect.Maps;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;

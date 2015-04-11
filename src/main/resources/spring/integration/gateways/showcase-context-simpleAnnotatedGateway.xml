@@ -1,0 +1,33 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<beans xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+       xmlns:integration="http://www.springframework.org/schema/integration"
+       xmlns:task="http://www.springframework.org/schema/task"
+       xmlns:context="http://www.springframework.org/schema/context"
+       xmlns="http://www.springframework.org/schema/beans"
+       xsi:schemaLocation="http://www.springframework.org/schema/beans
+       http://www.springframework.org/schema/beans/spring-beans.xsd
+		http://www.springframework.org/schema/integration
+		http://www.springframework.org/schema/integration/spring-integration.xsd
+		http://www.springframework.org/schema/task
+		http://www.springframework.org/schema/task/spring-task.xsd
+		http://www.springframework.org/schema/context
+		http://www.springframework.org/schema/context/spring-context.xsd">
+
+	<context:component-scan base-package="com.ead.spring.intergration.gateway"/>
+	<context:component-scan base-package="com.ead.spring.intergration.model"/>
+	<integration:message-history tracked-components="rejected"/>
+
+	<!--<bean class="org.springframework.integration.config.IntegrationComponentScanRegistrar"/>-->
+	<task:executor id="executor1" pool-size="10"/>
+	<integration:poller id="defaultPoller" default="true" fixed-delay="10000" task-executor="executor1"
+	                    max-messages-per-poll="100">
+	</integration:poller>
+
+	<integration:channel id="allFilesChannel"/>
+	<integration:channel id="outputChannel"/>
+
+
+	<integration:service-activator input-channel="allFilesChannel" ref="simpleStub">
+	</integration:service-activator>
+
+</beans>

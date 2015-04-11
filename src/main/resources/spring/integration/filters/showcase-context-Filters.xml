@@ -1,12 +1,12 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <!-- todo need to see if resolved in next version of intellij -->
 <!--suppress RequiredBeanTypeInspection -->
-<beans xmlns="http://www.springframework.org/schema/beans"
-       xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+<beans xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
        xmlns:context="http://www.springframework.org/schema/context"
        xmlns:integration="http://www.springframework.org/schema/integration"
        xmlns:file="http://www.springframework.org/schema/integration/file"
        xmlns:task="http://www.springframework.org/schema/task"
+       xmlns="http://www.springframework.org/schema/beans"
        xsi:schemaLocation="http://www.springframework.org/schema/beans
     http://www.springframework.org/schema/beans/spring-beans.xsd
     http://www.springframework.org/schema/context
@@ -43,12 +43,22 @@
 
 	<integration:outbound-channel-adapter channel="validated" ref="directoryListerEndPoint"
 	                                      method="handleFile">
-		<!--<filt-->
 	</integration:outbound-channel-adapter>
 	<!--<integration:logging-channel-adapter id="logChannel" expression="'Sending File=' + payload.path" channel="directoriesAndFilesChannel" level="INFO"/>-->
-
+	<!-- regular filter setting-->
 	<integration:filter id="cancellationsFilter" input-channel="allFilesChannel"
 	                    ref="customFilterBean" method="filter" discard-channel="rejected" output-channel="validated"/>
+
+
+	<!-- other way to filter-->
+	<bean id="typeSelector" class="org.springframework.integration.selector.PayloadTypeSelector">
+		<constructor-arg value="siia.channels.ChargedBooking"/>
+	</bean>
+
+	<bean id="typeSelectorInterceptor"
+	      class="org.springframework.integration.channel.interceptor.MessageSelectingInterceptor">
+		<constructor-arg ref="typeSelector"/>
+	</bean>
 
 	<integration:service-activator id="inputFileServiceActivator" input-channel="rejected"
 	                               ref="directoryListerServiceActivator"
@@ -60,8 +70,8 @@
 
 	<!--<integration:payload-type-router input-channel="allFilesTransformedChannel"
 	                                 default-output-channel="unknownFilesChannel">
-		<integration:mapping type="com.ead.spring.intergration.route.model.XmlFileMessage" channel="xmlFilesChannel"/>
-		<integration:mapping type="com.ead.spring.intergration.route.model.NonXmlFileMessage"
+		<integration:mapping type="com.ead.spring.intergration.model.XmlFileMessage" channel="xmlFilesChannel"/>
+		<integration:mapping type="com.ead.spring.intergration.model.NonXmlFileMessage"
 		                     channel="nonXmlFilesChannel"/>
 	</integration:payload-type-router>
 -->

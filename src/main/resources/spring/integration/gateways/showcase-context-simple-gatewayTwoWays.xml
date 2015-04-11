@@ -1,0 +1,44 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<beans xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+       xmlns:integration="http://www.springframework.org/schema/integration"
+       xmlns:task="http://www.springframework.org/schema/task"
+       xmlns:context="http://www.springframework.org/schema/context"
+       xmlns="http://www.springframework.org/schema/beans"
+       xsi:schemaLocation="http://www.springframework.org/schema/beans
+       http://www.springframework.org/schema/beans/spring-beans.xsd
+		http://www.springframework.org/schema/integration
+		http://www.springframework.org/schema/integration/spring-integration.xsd
+		http://www.springframework.org/schema/task
+		http://www.springframework.org/schema/task/spring-task.xsd
+		http://www.springframework.org/schema/context
+		http://www.springframework.org/schema/context/spring-context.xsd">
+
+	<context:component-scan base-package="com.ead.spring.intergration.gateway"/>
+	<context:component-scan base-package="com.ead.spring.intergration.model"/>
+	<integration:message-history tracked-components="rejected"/>
+
+	<task:executor id="executor1" pool-size="10"/>
+	<integration:poller id="defaultPoller" default="true" fixed-delay="10000" task-executor="executor1"
+	                    max-messages-per-poll="100">
+	</integration:poller>
+
+	<integration:gateway service-interface="com.ead.spring.intergration.gateway.SimpleGateway"
+	                     default-request-channel="allFilesChannel" default-reply-channel="outputChannel">
+
+	</integration:gateway>
+	<integration:channel id="allFilesChannel"/>
+	<integration:channel id="outputChannel">
+		<integration:queue capacity="10"/>
+	</integration:channel>
+
+	<!--<integration:logging-channel-adapter id="logChannel" expression="payload" channel="allFilesChannel" level="INFO"/>-->
+
+	<integration:service-activator input-channel="allFilesChannel" ref="simpleStub" output-channel="outputChannel">
+
+		<!--<bean class="com.ead.spring.intergration.gateway.SimpleStub" p:name="friendlyBank" p:baseRate="5.0"/>-->
+		<!--<integration:request-handler-advice-chain>
+			<ref bean="myAdvice"/>
+		</integration:request-handler-advice-chain>-->
+	</integration:service-activator>
+
+</beans>

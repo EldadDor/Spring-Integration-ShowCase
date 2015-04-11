@@ -1,4 +1,4 @@
-package com.ead.spring.intergration.route.model;
+package com.ead.spring.intergration.model;
 
 /**
  * Created by EAD-MASTER on 7/4/2015.

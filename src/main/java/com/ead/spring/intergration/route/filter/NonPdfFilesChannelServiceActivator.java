@@ -1,7 +1,7 @@
 package com.ead.spring.intergration.route.filter;
 
-import com.ead.spring.intergration.route.model.SimplePojo;
-import com.ead.spring.intergration.route.model.SimplePojoBuilder;
+import com.ead.spring.intergration.model.SimplePojo;
+import com.ead.spring.intergration.model.SimplePojoBuilder;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 import org.springframework.integration.annotation.ServiceActivator;
