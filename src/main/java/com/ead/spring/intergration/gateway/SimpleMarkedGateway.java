@@ -12,7 +12,6 @@ import java.util.List;
 public interface SimpleMarkedGateway {
 	@Gateway(requestChannel = "allFilesChannel", replyChannel = "outputChannel")
 	List<SimpleRequest> somethingSimpleWithReply(SimpleRequest request);
-
 	@Gateway(requestChannel = "allFilesChannel")
 	SimpleRequest somethingSimple(SimpleRequest request);
 

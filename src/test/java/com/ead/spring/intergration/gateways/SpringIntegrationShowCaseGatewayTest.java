@@ -28,7 +28,6 @@ import org.springframework.test.context.support.DelegatingSmartContextLoader;
 public class SpringIntegrationShowCaseGatewayTest {
 	@Autowired
 	private ApplicationContext context;
-
 	@Test
 	public void testFileFetch() throws Exception {
 		final SimpleGateway gateway = context.getBean(SimpleGateway.class);

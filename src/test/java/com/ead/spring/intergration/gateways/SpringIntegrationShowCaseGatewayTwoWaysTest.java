@@ -32,7 +32,6 @@ import java.util.List;
 public class SpringIntegrationShowCaseGatewayTwoWaysTest {
 	@Autowired
 	private ApplicationContext context;
-
 	@Test
 	public void testFileFetch() throws Exception {
 		final SimpleGateway gateway = context.getBean(SimpleGateway.class);

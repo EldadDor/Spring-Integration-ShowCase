@@ -1,0 +1,48 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<beans xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+       xmlns:context="http://www.springframework.org/schema/context"
+       xmlns:integration="http://www.springframework.org/schema/integration"
+       xmlns:file="http://www.springframework.org/schema/integration/file"
+       xmlns:task="http://www.springframework.org/schema/task"
+       xmlns="http://www.springframework.org/schema/beans"
+       xsi:schemaLocation="http://www.springframework.org/schema/beans
+    http://www.springframework.org/schema/beans/spring-beans.xsd
+    http://www.springframework.org/schema/context
+    http://www.springframework.org/schema/context/spring-context.xsd
+    http://www.springframework.org/schema/integration
+    http://www.springframework.org/schema/integration/spring-integration.xsd
+    http://www.springframework.org/schema/integration/file
+    http://www.springframework.org/schema/integration/file/spring-integration-file.xsd
+    http://www.springframework.org/schema/task
+    http://www.springframework.org/schema/task/spring-task.xsd">
+	<!--<integration:message-history tracked-components="rejected"/>-->
+	<context:component-scan base-package="com.ead.spring.intergration.aggregator"/>
+
+	<task:executor id="executor1" pool-size="10"/>
+	<integration:poller id="defaultPoller" default="true" fixed-delay="10000" task-executor="executor1"
+	                    max-messages-per-poll="100">
+	</integration:poller>
+
+	<integration:channel id="ordersChannel"/>
+	<integration:channel id="inventoryStoreRequestChannel"/>
+	<integration:channel id="inventoryStoreRequestExChannel"/>
+	<integration:channel id="inventoryStoreResponseChannel">
+
+	</integration:channel>
+	<integration:channel id="cookingChannel">
+		<integration:queue capacity="10"/>
+	</integration:channel>
+
+	<integration:splitter expression="payload.ingredients" input-channel="ordersChannel"
+	                      output-channel="inventoryStoreRequestChannel"/>
+
+	<integration:header-enricher input-channel="inventoryStoreRequestChannel"
+	                             output-channel="inventoryStoreRequestExChannel">
+		<integration:header name="Quantity" expression="payload.quantity()"/>
+	</integration:header-enricher>
+
+	<!--<integration:logging-channel-adapter id="logChannel" expression="'Payload=' + payload" channel="inventoryStoreResponseExChannel" level="INFO" auto-startup="true"/>-->
+
+	<!--<integration:outbound-channel-adapter channel="splitted" ref="directoryListerEndPoint" method="handleFile"/>-->
+
+</beans>

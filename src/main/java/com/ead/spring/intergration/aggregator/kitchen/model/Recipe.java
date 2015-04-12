@@ -1,5 +1,6 @@
-package com.ead.spring.intergration.aggregator.model;
+package com.ead.spring.intergration.aggregator.kitchen.model;
 
+import com.google.common.collect.Lists;
 import org.springframework.stereotype.Service;
 
 import java.util.List;
@@ -9,7 +10,7 @@ import java.util.List;
  */
 @Service
 public class Recipe {
-	private List<Ingredient> ingredients;
+	private List<Ingredient> ingredients = Lists.newLinkedList();
 
 	public void mixIngredients() {
 		for (Ingredient ingredient : ingredients) {
@@ -23,5 +24,12 @@ public class Recipe {
 
 	public List<Ingredient> getIngredients() {
 		return ingredients;
+	}
+
+	@Override
+	public String toString() {
+		return "Recipe{" +
+				"ingredients=" + ingredients +
+				'}';
 	}
 }

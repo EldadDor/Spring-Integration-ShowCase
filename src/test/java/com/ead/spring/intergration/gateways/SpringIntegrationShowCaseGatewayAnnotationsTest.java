@@ -34,7 +34,6 @@ import java.util.List;
 public class SpringIntegrationShowCaseGatewayAnnotationsTest {
 	@Autowired
 	private ApplicationContext context;
-
 	@Test
 	public void testFileFetch() throws Exception {
 		final SimpleMarkedGateway gateway = context.getBean(SimpleMarkedGateway.class);
