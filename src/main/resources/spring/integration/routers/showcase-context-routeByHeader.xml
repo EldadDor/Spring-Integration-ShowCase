@@ -26,35 +26,31 @@
 
 	<integration:channel id="allFilesChannel"/>
 	<integration:channel id="allFilesTransformedChannel"/>
-	<integration:channel id="xmlFilesChannel"/>
-	<integration:channel id="nonXmlFilesChannel"/>
-	<integration:channel id="unknownFilesChannel"/>
+	<integration:channel id="salsaSauceChannel"/>
+	<integration:channel id="soyaSauceChannel"/>
+	<integration:channel id="unknownCondiment"/>
 
 
 	<integration:inbound-channel-adapter id="customDirectoriesAndFilesInBound" channel="allFilesChannel"
 	                                     ref="customInboundAdapter" method="createInBoundMessages"/>
 
-	<file:inbound-channel-adapter id="directoriesAndFilesInBound" directory="file:/c:/pics" channel="allFilesChannel"
-	                              auto-startup="true"
-	                              queue-size="10" prevent-duplicates="false">
-	</file:inbound-channel-adapter>
-
 	<integration:header-enricher>
-		<integration:header expression=""/>
+		<integration:header name="PROCESSING_DESTINATION" expression="@headerEnricherBeanHandler.enrichMessageWithName(payload).name"/>
 	</integration:header-enricher>
 	<!--<integration:logging-channel-adapter id="logChannel" expression="'Sending File=' + payload.path" channel="directoriesAndFilesChannel" level="INFO"/>-->
 
 	<integration:transformer id="filesTransformer" ref="filesTypesMessageTransformer" input-channel="allFilesChannel"
 	                         output-channel="allFilesTransformedChannel"/>
 
-	<integration:service-activator id="inputFileServiceActivator" input-channel="directoriesAndFilesChannel"
-	                               ref="directoryListerServiceActivator"
-	                               method="processFile" auto-startup="true">
-	</integration:service-activator>
 
 	<integration:header-value-router input-channel="allFilesTransformedChannel"
-	                                 header-name="PROCESSING_DESTINATION">
-		<!--<integration:mapping value="CentralStation" channel=""-->
+	                                 header-name="PROCESSING_DESTINATION" default-output-channel="unknownCondiment">
+		<integration:mapping value="SALSA" channel="salsaSauceChannel"/>
+		<integration:mapping value="SOYA" channel="soyaSauceChannel"/>
 	</integration:header-value-router>
 
+	<!--<integration:service-activator id="inputFileServiceActivator" input-channel="directoriesAndFilesChannel"
+	                               ref="directoryListerServiceActivator"
+	                               method="processFile" auto-startup="true">
+	</integration:service-activator>-->
 </beans>

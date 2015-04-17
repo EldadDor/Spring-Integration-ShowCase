@@ -18,25 +18,65 @@
     http://www.springframework.org/schema/task
     http://www.springframework.org/schema/task/spring-task.xsd">
 	<integration:message-history/>
-	<context:component-scan base-package="com.ead.spring.intergration"/>
+	<context:component-scan base-package="com.ead.spring.intergration.route"/>
+	<context:component-scan base-package="com.ead.spring.intergration.model"/>
+	<context:component-scan base-package="com.ead.spring.intergration.handlers"/>
 
 	<task:executor id="executor1" pool-size="10"/>
-	<integration:poller id="defaultPoller" default="true" fixed-delay="10000" task-executor="executor1" max-messages-per-poll="10">
+	<integration:poller id="defaultPoller" default="true" fixed-delay="1000" task-executor="executor1"
+	                    max-messages-per-poll="20">
 	</integration:poller>
 
-
+	<!-- Entry Channels for Inbound files-->
 	<integration:channel id="allFilesChannel">
-		<!--<integration:queue capacity="10"/>-->
+		<integration:queue capacity="10"/>
 	</integration:channel>
 	<integration:channel id="xmlFilesChannel"/>
 	<integration:channel id="nonXmlFilesChannel"/>
 
+	<integration:channel id="routingGateChannel"/>
+	<integration:channel id="routePointOne"/>
+	<integration:channel id="routePointTwo"/>
 
-    <file:inbound-channel-adapter id="directoriesAndFilesInBound" directory="file:/e:/downloads"
-                                  channel="allFilesChannel" auto-startup="true"
+
+	<file:inbound-channel-adapter id="directoriesAndFilesInBound" directory="file:/e:/downloads"
+	                              channel="allFilesChannel" auto-startup="true"
 	                              queue-size="10" prevent-duplicates="false">
 	</file:inbound-channel-adapter>
 
+	<!-- First router passing randomly to Xml Or NonXml Channels -->
+	<integration:router id="filesRouter" input-channel="allFilesChannel" ref="allFilesToDestinationNameRouter"
+	                    method="routeToDestination">
+	</integration:router>
 
-	<integration:router id="filesRouter" input-channel="allFilesChannel" ref="allFilesToDestinationNameRouter" method="routeToDestination"/>
+	<!-- Enriching the message headers so we can route by the header value-->
+	<integration:header-enricher input-channel="xmlFilesChannel">
+		<integration:routing-slip value="XmlFile"/>
+	</integration:header-enricher>
+	<integration:header-enricher input-channel="nonXmlFilesChannel">
+		<integration:routing-slip value="NonXmlFile"/>
+	</integration:header-enricher>
+
+	<integration:service-activator id="xmlFileServiceActivator" input-channel="xmlFilesChannel" output-channel="routePointOne"
+	                               ref="directoryListerServiceActivator" method="processFile"/>
+	<integration:service-activator id="nonXmlInputFileServiceActivator" input-channel="nonXmlFilesChannel" output-channel="routePointTwo"
+	                               ref="directoryListerServiceActivator" method="processFile"/>
+
+
+	<integration:header-value-router input-channel="routingGateChannel" header-name="RoutingSlip">
+		<integration:mapping value="XmlFile" channel="routePointOne"/>
+		<integration:mapping value="NonXmlFile" channel="routePointTwo"/>
+	</integration:header-value-router>
+
+	<integration:outbound-channel-adapter channel="routePointOne" ref="directoryListerEndPoint" method="handleFile"/>
+	<integration:outbound-channel-adapter channel="routePointTwo" ref="directoryListerEndPoint" method="handleFile"/>
+
+
+	<integration:logging-channel-adapter id="logChannel1" expression="'Sending File=' + payload.path" channel="allFilesChannel" level="INFO"/>
+	<integration:logging-channel-adapter id="logChannel2" expression="'Sending File=' + payload.path" channel="xmlFilesChannel" level="INFO"/>
+	<integration:logging-channel-adapter id="logChannel3" expression="'Sending File=' + payload.path" channel="nonXmlFilesChannel" level="INFO"/>
+	<integration:logging-channel-adapter id="logChannel4" expression="'Sending File=' + payload.path" channel="routingGateChannel" level="INFO"/>
+	<integration:logging-channel-adapter id="logChannel5" expression="'Sending File=' + payload.path" channel="routePointOne" level="INFO"/>
+	<integration:logging-channel-adapter id="logChannel6" expression="'Sending File=' + payload.path" channel="routePointTwo" level="INFO"/>
+
 </beans>

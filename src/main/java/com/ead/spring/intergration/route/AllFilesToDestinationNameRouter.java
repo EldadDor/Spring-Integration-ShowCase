@@ -23,7 +23,6 @@ public class AllFilesToDestinationNameRouter {
 	private static final Log log = LogFactory.getLog(AllFilesToDestinationNameRouter.class);
 
 	public static void main(String[] args) {
-
 		for (int i = 0; i < 100; i++) {
 			final int rand = 1 + (int) (Math.random() * ((3 - 1) + 1));
 			log.info("main(): rand=" + rand);
@@ -34,6 +33,10 @@ public class AllFilesToDestinationNameRouter {
 		log.info("routeToDestination():");
 		final int rand = 1 + (int) (Math.random() * ((3 - 1) + 1));
 		log.info("routeToDestination(): rand=" + rand);
-		return "";
+		if (rand <= 2) {
+			return "xmlFilesChannel";
+		} else {
+			return "nonXmlFilesChannel";
+		}
 	}
 }

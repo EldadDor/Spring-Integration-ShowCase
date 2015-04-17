@@ -25,7 +25,8 @@
 
 	<integration:channel id="ordersChannel"/>
 	<integration:channel id="inventoryStoreRequestChannel"/>
-	<integration:channel id="inventoryStoreRequestExChannel"/>
+	<integration:channel id="inventoryStoreRequestAddHeaderChannel"/>
+	<integration:channel id="inventoryStoreRequestRemoveHeadaerChannel"/>
 	<integration:channel id="inventoryStoreResponseChannel">
 
 	</integration:channel>
@@ -34,13 +35,15 @@
 	</integration:channel>
 
 	<integration:splitter expression="payload.ingredients" input-channel="ordersChannel"
-	                      output-channel="inventoryStoreRequestChannel"/>
+	                      output-channel="inventoryStoreRequestChannel" apply-sequence="true"/>
 
 	<integration:header-enricher input-channel="inventoryStoreRequestChannel"
-	                             output-channel="inventoryStoreRequestExChannel">
+	                             output-channel="inventoryStoreRequestAddHeaderChannel">
 		<integration:header name="Quantity" expression="payload.quantity()"/>
 	</integration:header-enricher>
 
+	<integration:header-filter input-channel="inventoryStoreRequestAddHeaderChannel" header-names="Quantity"
+	                           output-channel="inventoryStoreRequestRemoveHeadaerChannel"/>
 
 	<!--<integration:logging-channel-adapter id="logChannel" expression="'Payload=' + payload" channel="inventoryStoreResponseExChannel" level="INFO" auto-startup="true"/>-->
 

@@ -24,24 +24,29 @@
 	<task:executor id="executor1" pool-size="10"/>
 	<task:executor id="executor2" pool-size="1"/>
 
-	<integration:poller id="defaultPoller" default="true" fixed-delay="10000" task-executor="executor1" max-messages-per-poll="10"/>
-	<integration:poller id="defaultPoller2" fixed-delay="10000" task-executor="executor2" max-messages-per-poll="10"/>
+	<integration:poller id="defaultPoller" default="true" fixed-delay="10000" task-executor="executor1"
+	                    max-messages-per-poll="10"/>
 	<!--QueueChannel-->
-	<integration:channel id="directoriesAndFilesChannel">
+	<integration:channel id="directoriesAndFilesInChannel">
 		<integration:queue capacity="10"/>
 	</integration:channel>
+	<integration:channel id="directoriesAndFilesOutChannel">
+	</integration:channel>
 
-	<file:inbound-channel-adapter id="directoriesAndFilesInBound" directory="file:/e:/downloads" channel="directoriesAndFilesChannel" auto-startup="true"
+
+	<integration:logging-channel-adapter id="logChannel" expression="'Sending File=' + payload.path"
+	                                     channel="directoriesAndFilesInChannel" level="INFO"/>
+
+	<file:inbound-channel-adapter id="directoriesAndFilesInBound" directory="file:/e:/downloads"
+	                              channel="directoriesAndFilesInChannel" auto-startup="true"
 	                              queue-size="10" prevent-duplicates="false">
 	</file:inbound-channel-adapter>
 
-
-	<integration:logging-channel-adapter id="logChannel" expression="'Sending File=' + payload.path" channel="directoriesAndFilesChannel" level="INFO"/>
-
-
-	<integration:service-activator id="inputFileServiceActivator" input-channel="directoriesAndFilesChannel" ref="directoryListerServiceActivator"
-	                               method="processFile" auto-startup="true">
-		<integration:poller ref="defaultPoller2"/>
-	</integration:service-activator>
-
+	<integration:chain input-channel="directoriesAndFilesInChannel">
+		<integration:poller ref="defaultPoller"/>
+		<integration:service-activator id="inputFileServiceActivator"
+		                               ref="directoryListerServiceActivator" method="processFile">
+		</integration:service-activator>
+		<integration:outbound-channel-adapter ref="directoryListerEndPoint" method="handleFile"/>
+	</integration:chain>
 </beans>

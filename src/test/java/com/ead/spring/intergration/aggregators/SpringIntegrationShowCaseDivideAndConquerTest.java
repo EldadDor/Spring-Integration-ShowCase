@@ -38,7 +38,7 @@ public class SpringIntegrationShowCaseDivideAndConquerTest {
 		context.getBeanDefinitionNames();
 		final Recipe recipe = createRecipe();
 		context.getBean(HeadChef.class).makeRecipe(recipe);
-		log.info("testFileFetch(): recipe=" + recipe);
+		log.info("testChaiing(): recipe=" + recipe);
 	}
 
 	private Recipe createRecipe() {
