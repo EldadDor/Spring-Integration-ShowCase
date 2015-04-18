@@ -18,7 +18,8 @@
     http://www.springframework.org/schema/task
     http://www.springframework.org/schema/task/spring-task.xsd">
 	<integration:message-history tracked-components="rejected"/>
-	<context:component-scan base-package="com.ead.spring.intergration"/>
+	<context:component-scan base-package="com.ead.spring.intergration.handlers"/>
+	<context:component-scan base-package="com.ead.spring.intergration.model"/>
 
 	<task:executor id="executor1" pool-size="10"/>
 	<integration:poller id="defaultPoller" default="true" fixed-delay="10000" task-executor="executor1"
@@ -28,7 +29,7 @@
 	<integration:channel id="allFilesChannel"/>
 	<integration:channel id="splitted"/>
 
-	<integration:splitter expression="payload.list" input-channel="allFilesChannel" output-channel="splitted"/>
+	<integration:splitter expression="payload.list()" input-channel="allFilesChannel" output-channel="splitted"/>
 
 	<file:inbound-channel-adapter id="directoriesAndFilesInBound" directory="file:/E:/Downloads"
 	                              channel="allFilesChannel"

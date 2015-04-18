@@ -18,7 +18,9 @@
     http://www.springframework.org/schema/task
     http://www.springframework.org/schema/task/spring-task.xsd">
 	<integration:message-history tracked-components="rejected"/>
-	<context:component-scan base-package="com.ead.spring.intergration"/>
+	<context:component-scan base-package="com.ead.spring.intergration.handlers"/>
+	<context:component-scan base-package="com.ead.spring.intergration.model"/>
+	<context:component-scan base-package="com.ead.spring.intergration.route.filter"/>
 
 	<task:executor id="executor1" pool-size="10"/>
 	<integration:poller id="defaultPoller" default="true" fixed-delay="10000" task-executor="executor1"
@@ -51,20 +53,23 @@
 
 
 	<!-- other way to filter-->
-	<bean id="typeSelector" class="org.springframework.integration.selector.PayloadTypeSelector">
-		<constructor-arg value="siia.channels.ChargedBooking"/>
-	</bean>
+	<!--
+		<bean id="typeSelector" class="org.springframework.integration.selector.PayloadTypeSelector">
+			<constructor-arg value="siia.channels.ChargedBooking"/>
+		</bean>
 
-	<bean id="typeSelectorInterceptor"
-	      class="org.springframework.integration.channel.interceptor.MessageSelectingInterceptor">
-		<constructor-arg ref="typeSelector"/>
-	</bean>
 
-	<integration:service-activator id="inputFileServiceActivator" input-channel="rejected"
-	                               ref="directoryListerServiceActivator"
-	                               method="processFile" auto-startup="true">
+		<bean id="typeSelectorInterceptor"
+			  class="org.springframework.integration.channel.interceptor.MessageSelectingInterceptor">
+			<constructor-arg ref="typeSelector"/>
+		</bean>
+	-->
 
-	</integration:service-activator>
+	<integration:outbound-channel-adapter channel="rejected" ref="directoryListerEndPoint"
+	                                      method="handleFile" auto-startup="true"/>
+	<integration:outbound-channel-adapter channel="validated" ref="directoryListerEndPoint"
+	                                      method="handleFile" auto-startup="true"/>
+
 
 	<!--<integration:transformer id="filesTransformer" ref="filesTypesMessageTransformer" input-channel="allFilesChannel" output-channel="allFilesTransformedChannel"/>-->
 

@@ -12,8 +12,7 @@ import java.io.File;
  * Created by EAD-MASTER on 7/4/2015.
  */
 @Service
-public class CustomFilterBean {
-//		implements MessageSelector {
+public class CustomFilterBean /*implements MessageSelector {*/ {
 	private static final Log log = LogFactory.getLog(CustomFilterBean.class);
 
 	public boolean filter(Message<?> message) {
@@ -25,4 +24,8 @@ public class CustomFilterBean {
 		return false;
 	}
 
+/*	@Override
+	public boolean accept(Message<?> message) {
+		return false;
+	}*/
 }

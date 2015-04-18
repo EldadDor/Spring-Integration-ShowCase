@@ -1,12 +1,12 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <!-- todo need to see if resolved in next version of intellij -->
 <!--suppress RequiredBeanTypeInspection -->
-<beans xmlns="http://www.springframework.org/schema/beans"
-       xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+<beans xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
        xmlns:file="http://www.springframework.org/schema/integration/file"
        xmlns:context="http://www.springframework.org/schema/context"
        xmlns:task="http://www.springframework.org/schema/task"
        xmlns:integration="http://www.springframework.org/schema/integration"
+       xmlns="http://www.springframework.org/schema/beans"
        xsi:schemaLocation="http://www.springframework.org/schema/beans
     http://www.springframework.org/schema/beans/spring-beans.xsd
     http://www.springframework.org/schema/integration/file
@@ -18,7 +18,8 @@
     http://www.springframework.org/schema/task
     http://www.springframework.org/schema/task/spring-task.xsd">
 	<integration:message-history/>
-	<context:component-scan base-package="com.ead.spring.intergration"/>
+	<context:component-scan base-package="com.ead.spring.intergration.model"/>
+	<context:component-scan base-package="com.ead.spring.intergration.handlers"/>
 
 	<task:executor id="executor1" pool-size="10"/>
 	<task:executor id="executor2" pool-size="1"/>
@@ -30,7 +31,7 @@
 		<integration:queue capacity="10"/>
 	</integration:channel>
 
-	<file:inbound-channel-adapter id="directoriesAndFilesInBound" directory="file:/c:/com.idi.ifs/in" channel="directoriesAndFilesPublishSubscribeChannel" auto-startup="true"
+	<file:inbound-channel-adapter id="directoriesAndFilesInBound" directory="file:/e:/downloads" channel="directoriesAndFilesPublishSubscribeChannel" auto-startup="true"
 	                              queue-size="10" prevent-duplicates="false">
 	</file:inbound-channel-adapter>
 
