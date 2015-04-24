@@ -15,20 +15,24 @@ import java.util.List;
 @Scope(BeanDefinition.SCOPE_PROTOTYPE)
 public class Pallet {
 	public static final int MAX_BOXES_IN_PALLET = 12;
-	private List<FruitBox> fruitFruitBoxes;
+	private List<FruitBox> fruitBoxList;
 	private boolean isFull = false;
 
 	@PostConstruct
 	public void init() {
-		fruitFruitBoxes = Lists.newLinkedList();
+		fruitBoxList = Lists.newLinkedList();
 		final List<Fruit> fruitsInBox = Lists.newLinkedList();
 	}
 
 	public void addBox(FruitBox fruitBox) {
-		fruitFruitBoxes.add(fruitBox);
-		if (fruitFruitBoxes.size() == MAX_BOXES_IN_PALLET) {
+		fruitBoxList.add(fruitBox);
+		if (fruitBoxList.size() == MAX_BOXES_IN_PALLET) {
 			isFull = true;
 		}
+	}
+
+	public List<FruitBox> getFruitBoxList() {
+		return fruitBoxList;
 	}
 
 	public boolean isFull() {

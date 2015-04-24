@@ -25,7 +25,14 @@
 	<integration:channel id="InitialPalletsChannel"/>
 	<integration:channel id="InecptionPalletsChannel"/>
 	<integration:channel id="InecptionFruitsChannel"/>
+	<integration:channel id="FilteringChannel"/>
 	<integration:channel id="InpectedPalletsChannel"/>
+	<integration:channel id="FinalInspectionChannel">
+		<!--<integration:queue capacity="100"/>-->
+	</integration:channel>
+	<integration:channel id="OutPutPalletsChannel">
+		<!--<integration:queue capacity="100"/>-->
+	</integration:channel>
 	<!--<integration:channel id="inventoryStoreRequestRemoveHeadaerChannel"/>
 	<integration:channel id="inventoryStoreResponseChannel">
 
@@ -33,12 +40,15 @@
 	<integration:channel id="cookingChannel">
 		<integration:queue capacity="10"/>
 	</integration:channel>-->
+	<integration:logging-channel-adapter id="logChannel1" expression="'Sending =' + payload" channel="InecptionFruitsChannel" level="INFO"/>
+	<!--<integration:logging-channel-adapter id="logChannel2" expression="'Sending =' + payload" channel="InitialPalletsChannel" level="INFO"/>-->
 
-	<integration:splitter expression="payload.fruitFruitBoxes" input-channel="InitialPalletsChannel"
-	                      output-channel="InecptionPalletsChannel" apply-sequence="true"/>
-
-	<integration:splitter expression="payload.fruits" input-channel="InecptionFruitsChannel"
+	<integration:splitter expression="payload.fruitBoxList" input-channel="InitialPalletsChannel"
 	                      output-channel="InecptionFruitsChannel" apply-sequence="true"/>
+	<!-- expression="payload.fruits"-->
+	<integration:splitter input-channel="InecptionFruitsChannel" ref="deliverySplitter"
+	                      output-channel="FilteringChannel" apply-sequence="true" method="splitForInspection"/>
+	<integration:filter input-channel="FilteringChannel" output-channel="InpectedPalletsChannel" ref="fruitInspector"/>
 	<!--
 
 		<integration:header-enricher input-channel="inventoryStoreRequestChannel"
@@ -50,10 +60,19 @@
 	<!--<integration:header-filter input-channel="inventoryStoreRequestAddHeaderChannel" header-names="Quantity"
 	                           output-channel="inventoryStoreRequestRemoveHeadaerChannel"/>-->
 
-	<integration:gateway service-interface="com.ead.spring.intergration.aggregator.market.MarketGateway"/>
-	<integration:aggregator input-channel="InecptionFruitsChannel" ref="deliveryAggregator" method="aggregateFruits"
-	                        output-channel="InpectedPalletsChannel">
+	<integration:gateway service-interface="com.ead.spring.intergration.aggregator.market.MarketGateway">
+		<!--<integration:method name="takePassedInspectionPallet" payload-expression="">-->
+
+		<!--</integration:method>-->
+	</integration:gateway>
+
+	<!--release-strategy="fruitsBoxReleaseStrategy"-->
+	<!--correlation-strategy="fruitsCorrelationStrategy"-->
+	<integration:aggregator input-channel="InpectedPalletsChannel" ref="deliveryAggregator"
+	                        method="aggregateFruits"
+	                        output-channel="FinalInspectionChannel">
 	</integration:aggregator>
+	<integration:outbound-channel-adapter channel="OutPutPalletsChannel" ref="palletsInspectedHandler" method="handlePallet"/>
 	<!--<integration:logging-channel-adapter id="logChannel" expression="'Payload=' + payload" channel="inventoryStoreResponseExChannel" level="INFO" auto-startup="true"/>-->
 
 	<!--<integration:outbound-channel-adapter channel="splitted" ref="directoryListerEndPoint" method="handleFile"/>-->

@@ -41,6 +41,8 @@ public class SpringIntegrationShowCaseMarketTest {
 		final MarketManager marketManager = context.getBean(MarketManager.class);
 		final Pallet applePallet = marketManager.createFruits(1000, Apple.class);
 		gateway.placeDelivery(applePallet);
+		final Pallet passedInspectionPallet = gateway.takePassedInspectionPallet();
+		log.info("testFileFetch():");
 	}
 
 
