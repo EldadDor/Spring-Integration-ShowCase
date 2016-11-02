@@ -29,10 +29,10 @@ public class DirectoryListerServiceActivator {
 	@ServiceActivator
 	public Message<?> processFile(Message<?> message) {
 		log.info("processFile(): message=" + message.getPayload());
-		for (Properties next : message.getHeaders().get(MessageHistory.HEADER_NAME, MessageHistory.class)) {
-			final Object o = next.get(MessageHistory.NAME_PROPERTY);
-			log.info("processFile(): passed via message history=" + o);
-		}
+//		for (Properties next : message.getHeaders().get(MessageHistory.HEADER_NAME, MessageHistory.class)) {
+//			final Object o = next.get(MessageHistory.NAME_PROPERTY);
+//			log.info("processFile(): passed via message history=" + o);
+//		}
 		return message;
 	}
 }
